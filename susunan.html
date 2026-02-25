@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Agenda Tunangan iOS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --ios-blue: #007AFF;
+            --ios-bg: #F2F2F7;
+            --ios-card: rgba(255, 255, 255, 0.75);
+        }
+
+        body {
+            /* System Font Apple */
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--ios-bg);
+            background-image: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            color: #000;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overscroll-behavior-y: contain;
+            letter-spacing: -0.015em;
+        }
+
+        /* iOS Glassmorphism */
+        .glass-card {
+            background: var(--ios-card);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 28px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+        }
+
+        .ios-btn-next {
+            background-color: var(--ios-blue);
+            transition: all 0.2s ease;
+        }
+
+        .ios-btn-next:active {
+            transform: scale(0.96);
+            opacity: 0.8;
+        }
+
+        .dot {
+            transition: all 0.3s ease;
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .dot-active {
+            background-color: var(--ios-blue);
+            width: 18px;
+            border-radius: 10px;
+        }
+
+        .content-scroll {
+            flex-grow: 1;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .content-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* iOS Notification Style */
+        .ios-notification {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 18px;
+            padding: 16px;
+            margin-top: 12px;
+            border: 0.5px solid rgba(0,0,0,0.05);
+        }
+
+        .status-pill {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--ios-blue);
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .transition-layer {
+            transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        #welcome-screen {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hidden-ios {
+            opacity: 0;
+            transform: scale(1.1);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="p-5 flex items-center justify-center">
+
+    <!-- WELCOME SCREEN -->
+    <div id="welcome-screen" class="fixed inset-0 z-50 flex items-center justify-center p-5 bg-white/20 backdrop-blur-md">
+        <div class="glass-card w-full max-w-sm p-10 text-center flex flex-col items-center">
+            <div class="w-20 h-20 bg-blue-500 rounded-3xl flex items-center justify-center text-white text-4xl shadow-xl mb-6">
+                &#10084;
+            </div>
+            <h1 class="text-3xl font-bold tracking-tight mb-2">Timeline Acara</h1>
+            <p class="text-gray-500 mb-10 text-sm px-4">Susunan acara Prosesi Tunangan </p>
+            
+            <button id="start-app" class="ios-btn-next w-full text-white py-4 rounded-2xl font-bold text-[17px] shadow-lg">
+                Mulai Agenda
+            </button>
+        </div>
+    </div>
+
+    <div class="w-full max-w-sm mx-auto flex flex-col h-[85vh] md:h-[800px]">
+        
+        <!-- Header / Clock Area Mockup -->
+        <div class="text-center mb-8">
+            <h2 class="text-xs font-semibold uppercase tracking-widest opacity-40 mb-1">Agenda Tunangan</h2>
+            <div id="ios-time" class="text-5xl font-bold tracking-tight">11:34</div>
+        </div>
+
+        <!-- Main iOS Popup Card -->
+        <div id="main-card" class="glass-card transition-layer p-6 flex flex-col flex-grow opacity-100">
+            
+            <div class="flex justify-between items-start mb-5">
+                <div id="step-icon" class="text-2xl bg-white/50 w-11 h-11 flex items-center justify-center rounded-2xl shadow-sm 
+
+border border-white/40">
+                    &#128694;
+                </div>
+                <div class="status-pill" id="duration-label">SIAGA</div>
+            </div>
+
+            <div class="mb-4">
+                <span id="step-label" class="text-[10px] font-bold text-blue-600/60 uppercase tracking-wider block mb-1">TAHAP 1 
+
+DARI 6</span>
+                <h1 id="title" class="text-2xl font-bold text-black leading-tight tracking-tight">
+                    Memuat...
+                </h1>
+            </div>
+
+            <div id="content" class="content-scroll text-[15px] text-gray-800 leading-snug">
+                <!-- Dynamic Content -->
+            </div>
+
+            <!-- Footer Navigation Inside Card -->
+            <div class="pt-4 border-t border-black/5 mt-auto">
+                <div id="dots" class="flex gap-1.5 justify-center mb-6">
+                    <!-- Dots -->
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button id="btn-prev" class="flex-1 py-4 text-blue-600 font-semibold text-[16px]">
+                        Kembali
+                    </button>
+                    <button id="btn-next" class="ios-btn-next flex-[2.5] text-white py-4 rounded-2xl font-bold text-[16px] shadow-lg">
+                        Selanjutnya
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const agenda = [
+            {
+                title: "Kedatangan & Penyambutan",
+                icon: "&#128694;",
+                duration: "DITUNGGU",
+                nextBtnText: "Ke Pembukaan",
+                desc: `
+                    <div class="ios-notification">
+                        <p class="font-semibold mb-1">Keluarga Pria Tiba</p>
+                        <p class="opacity-70 text-sm">Keluarga besar calon mempelai pria datang ke lokasi acara.</p>
+                    </div>
+                    <div class="ios-notification">
+                        <p class="font-semibold mb-1">Penyambutan</p>
+                        <p class="opacity-70 text-sm">Keluarga wanita menyambut hangat tamu di pintu masuk.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Pembukaan Acara",
+                icon: "&#127897;",
+                duration: "5 MENIT",
+                nextBtnText: "Ke Sambutan Pria",
+                desc: `
+                    <p class="mb-3 px-1">MC membuka acara secara resmi dengan salam dan doa.</p>
+                    <div class="ios-notification bg-blue-50/30">
+                        <p class="font-bold text-blue-600 mb-1">Sambutan Tuan Rumah</p>
+                        <p class="text-sm">Sambutan perwakilan keluarga wanita, menanyakan maksud dan tujuan kedatangan tamu 
+
+secara resmi.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Sambutan Keluarga Pria",
+                icon: "&#128483;",
+                duration: "10 MENIT",
+                nextBtnText: "Ke Prosesi Inti",
+                desc: `
+                    <div class="space-y-3">
+                        <p class="px-1">• Penyampaian rasa syukur keluarga pria.</p>
+                        <p class="px-1">• Perkenalan keluarga besar & calon mempelai pria.</p>
+                        <div class="ios-notification">
+                            <p class="font-medium text-black">Penyampaian maksud pertemuan untuk pengikatan/tunangan.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Prosesi Pengikatan",
+                icon: "&#128141;",
+                duration: "20 MENIT",
+                nextBtnText: "Ke Doa Penutup",
+                desc: `
+                    <p class="text-[11px] font-bold opacity-30 uppercase tracking-widest mb-2 px-1">Pernyataan Resmi</p>
+                    <div class="ios-notification bg-white/80 shadow-sm border-blue-100">
+                        <p class="text-blue-600 font-bold text-xs mb-2">Naskah Pernyataan Perempuan:</p>
+                        <p class="font-bold italic mb-2">"Bismillahirrahmanirrahim."</p>
+                        <p class="mb-2">"Dengan memohon ridho Allah SWT serta restu kedua orang tua dan keluarga besar, pada hari 
+
+yang penuh kebahagiaan ini saya, <span class="text-blue-600 font-bold">(Nama Anda)</span>, dengan tulus dan penuh 
+
+kesadaran menyatakan menerima ikatan pertunangan dengan <span class="text-blue-600 font-bold">(Nama Calon Pria)
+
+</span>.Semoga pertunangan ini menjadi awal yang baik bagi perjalanan kami menuju pernikahan, serta senantiasa diberkahi, 
+
+dilancarkan, dan dijaga dalam kebaikan.</p>
+                        <p class="text-xs opacity-60 italic">"Wassalamu’alaikum wr. wb."</p>
+                    </div>
+                    <div class="flex gap-2 mt-3">
+                        <div class="ios-notification flex-1 text-center py-3">
+                            <p class="text-[10px] font-bold opacity-40">CINCIN</p>
+                            <p class="text-xs font-semibold">Penyematan</p>
+                        </div>
+                        <div class="ios-notification flex-1 text-center py-3">
+                            <p class="text-[10px] font-bold opacity-40">SESERAHAN</p>
+                            <p class="text-xs font-semibold">Penyerahan</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Doa dan Penutup",
+                icon: "&#129330;",
+                duration: "10 MENIT",
+                nextBtnText: "Ke Sesi Foto",
+                desc: `
+                    <div class="ios-notification text-center py-8">
+                        <p class="text-2xl mb-2">&#128483;</p>
+                        <p class="font-bold text-lg mb-1">Doa Bersama</p>
+                        <p class="opacity-60 text-sm">Dipimpin oleh sesepuh atau yang dituakan.</p>
+                    </div>
+                    <p class="mt-4 text-center text-sm opacity-40 italic">MC menutup sesi formal.</p>
+                `
+            },
+            {
+                title: "Foto & Ramah Tamah",
+                icon: "&#128247;",
+                duration: "SELESAI",
+                nextBtnText: "Tutup Agenda",
+                desc: `
+                    <div class="ios-notification">
+                        <p class="font-semibold mb-1">Sesi Dokumentasi</p>
+                        <p class="opacity-70 text-sm">Foto bersama keluarga inti dan tamu undangan.</p>
+                    </div>
+                    <div class="ios-notification">
+                        <p class="font-semibold mb-1">Jamuan Makan</p>
+                        <p class="opacity-70 text-sm">Menikmati hidangan dan berbincang santai antar keluarga.</p>
+                    </div>
+                `
+            }
+        ];
+
+        let current = 0;
+
+        function update() {
+            const step = agenda[current];
+            const card = document.getElementById('main-card');
+            
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.98)';
+
+            setTimeout(() => {
+                document.getElementById('title').innerHTML = step.title;
+                document.getElementById('content').innerHTML = step.desc;
+                document.getElementById('step-icon').innerHTML = step.icon;
+                document.getElementById('step-label').innerText = `TAHAP ${current + 1} DARI ${agenda.length}`;
+                document.getElementById('duration-label').innerText = step.duration;
+                document.getElementById('btn-next').innerText = step.nextBtnText;
+                
+                const btnPrev = document.getElementById('btn-prev');
+                btnPrev.style.display = (current === 0) ? 'none' : 'block';
+
+                renderDots();
+
+                card.style.opacity = '1';
+                card.style.transform = 'scale(1)';
+                document.getElementById('content').scrollTop = 0;
+            }, 200);
+        }
+
+        function renderDots() {
+            const container = document.getElementById('dots');
+            container.innerHTML = '';
+            agenda.forEach((_, i) => {
+                const d = document.createElement('div');
+                d.className = i === current ? 'dot h-1.5 dot-active' : 'dot h-1.5 w-1.5 rounded-full';
+                container.appendChild(d);
+            });
+        }
+
+        // Welcome Screen Logic
+        document.getElementById('start-app').addEventListener('click', () => {
+            document.getElementById('welcome-screen').classList.add('hidden-ios');
+            setTimeout(() => {
+                document.getElementById('welcome-screen').style.display = 'none';
+            }, 500);
+        });
+
+        document.getElementById('btn-next').addEventListener('click', () => {
+            if (current < agenda.length - 1) {
+                current++;
+                update();
+            } else {
+                location.reload();
+            }
+        });
+
+        document.getElementById('btn-prev').addEventListener('click', () => {
+            if (current > 0) {
+                current--;
+                update();
+            }
+        });
+
+        // Live Clock Mockup
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('ios-time').innerText = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes
+
+().toString().padStart(2, '0');
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        window.onload = update;
+    </script>
+</body>
+</html>
